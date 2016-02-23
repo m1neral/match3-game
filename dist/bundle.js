@@ -361,7 +361,7 @@
 	                            y: j - verticalClusterLength + 1,
 	                            length: verticalClusterLength,
 	                            vertical: true,
-	                            type: this.gameState.cells[i][j - verticalClusterLength + 1]
+	                            type: this.gameState.cells[j - verticalClusterLength + 1][i]
 	                        });
 	                        verticalClusterLength = 1;
 	                    }
@@ -372,7 +372,7 @@
 	                            y: i,
 	                            length: horizontalClusterLength,
 	                            vertical: false,
-	                            type: this.gameState.cells[j - horizontalClusterLength + 1][i]
+	                            type: this.gameState.cells[i][j - horizontalClusterLength + 1]
 	                        });
 	                        horizontalClusterLength = 1;
 	                    }
