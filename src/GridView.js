@@ -1,4 +1,4 @@
-import { CONTAINER, SCORE_LABEL, FIGURES } from './Settings';
+import { CONTAINER, SCORE_LABEL, FINISH_GAME, FIGURES } from './Settings';
 
 export default class GridView {
     constructor(gameState) {
@@ -83,6 +83,11 @@ export default class GridView {
     }
 
     updateScoreLabel() {
-        SCORE_LABEL.innerHTML = this.gameState.getScore();
+        if (this.gameState.getScore() < FINISH_GAME.score) {
+            SCORE_LABEL.innerHTML = this.gameState.getScore();
+        } else {
+            SCORE_LABEL.innerHTML = FINISH_GAME.message;
+            CONTAINER.style.opacity = 0.2;
+        }
     }
 }

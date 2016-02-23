@@ -95,7 +95,8 @@ export default class Model {
                         x: i,
                         y: j - verticalClusterLength + 1,
                         length: verticalClusterLength,
-                        vertical: true
+                        vertical: true,
+                        type: this.gameState.cells[i][j - verticalClusterLength + 1]
                     });
                     verticalClusterLength = 1;
                 }
@@ -108,7 +109,8 @@ export default class Model {
                         x: j - horizontalClusterLength + 1,
                         y: i,
                         length: horizontalClusterLength,
-                        vertical: false
+                        vertical: false,
+                        type: this.gameState.cells[j - horizontalClusterLength + 1][i]
                     });
                     horizontalClusterLength = 1;
                 }
@@ -121,6 +123,24 @@ export default class Model {
     generateValidGameState() {
         this.generateRandomGameState();
         this.removeClusters();
+    }
+
+    handleMove(x1, y1, x2, y2) {
+        this.swapCells(x1, y1, x2, y2);
+        if (this.findClusters()) {
+            this.increaseScore(this.getScoreOfMove(this.clusters));
+            this.removeClusters();
+        } else this.swapCells(x1, y1, x2, y2);
+    }
+
+    getScoreOfMove(clusters) {
+        let score = 0;
+        for (let cluster of clusters) score += FIGURES[cluster.type].points * cluster.length;
+        return score;
+    }
+
+    increaseScore(count) {
+        this.score += count;
     }
 
     // Static
@@ -136,16 +156,10 @@ export default class Model {
     }
 
     setGameStateMove(x1, y1, x2, y2) {
-        this.swapCells(x1, y1, x2, y2);
-        this.increaseScore(1);
-        this.removeClusters();
+        this.handleMove(x1, y1, x2, y2);
     }
 
     getScore() {
         return this.score;
-    }
-
-    increaseScore(count) {
-        this.score += count;
     }
 }
