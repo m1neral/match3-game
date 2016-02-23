@@ -12,7 +12,6 @@ export default class Model {
             offsets: []
         };
         this.clusters = [];
-        this.moves = [];
         this.score = 0;
     }
 

@@ -198,7 +198,12 @@
 	    }, {
 	        key: 'updateScoreLabel',
 	        value: function updateScoreLabel() {
-	            _Settings.SCORE_LABEL.innerHTML = this.gameState.getScore();
+	            if (this.gameState.getScore() < _Settings.FINISH_GAME.score) {
+	                _Settings.SCORE_LABEL.innerHTML = this.gameState.getScore();
+	            } else {
+	                _Settings.SCORE_LABEL.innerHTML = _Settings.FINISH_GAME.message;
+	                _Settings.CONTAINER.style.opacity = 0.2;
+	            }
 	        }
 	    }]);
 
@@ -219,6 +224,7 @@
 	var CONTAINER = exports.CONTAINER = document.getElementById('game-container');
 	var SCORE_LABEL = exports.SCORE_LABEL = document.getElementById('score');
 	var GRID_SIZE = exports.GRID_SIZE = { columns: 9, rows: 9 };
+	var FINISH_GAME = exports.FINISH_GAME = { score: 500, message: 'Congratulations! Game over! Refresh a page!' };
 	var FIGURES = exports.FIGURES = [{
 	    name: 'square',
 	    points: 10,
@@ -265,7 +271,6 @@
 	                offsets: []
 	            };
 	            this.clusters = [];
-	            this.moves = [];
 	            this.score = 0;
 	        }
 	    }, {
@@ -355,7 +360,8 @@
 	                            x: i,
 	                            y: j - verticalClusterLength + 1,
 	                            length: verticalClusterLength,
-	                            vertical: true
+	                            vertical: true,
+	                            type: this.gameState.cells[i][j - verticalClusterLength + 1]
 	                        });
 	                        verticalClusterLength = 1;
 	                    }
@@ -365,7 +371,8 @@
 	                            x: j - horizontalClusterLength + 1,
 	                            y: i,
 	                            length: horizontalClusterLength,
-	                            vertical: false
+	                            vertical: false,
+	                            type: this.gameState.cells[j - horizontalClusterLength + 1][i]
 	                        });
 	                        horizontalClusterLength = 1;
 	                    }
@@ -378,6 +385,50 @@
 	        value: function generateValidGameState() {
 	            this.generateRandomGameState();
 	            this.removeClusters();
+	        }
+	    }, {
+	        key: 'handleMove',
+	        value: function handleMove(x1, y1, x2, y2) {
+	            this.swapCells(x1, y1, x2, y2);
+	            if (this.findClusters()) {
+	                this.increaseScore(this.getScoreOfMove(this.clusters));
+	                this.removeClusters();
+	            } else this.swapCells(x1, y1, x2, y2);
+	        }
+	    }, {
+	        key: 'getScoreOfMove',
+	        value: function getScoreOfMove(clusters) {
+	            var score = 0;
+	            var _iteratorNormalCompletion = true;
+	            var _didIteratorError = false;
+	            var _iteratorError = undefined;
+
+	            try {
+	                for (var _iterator = clusters[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                    var cluster = _step.value;
+	                    score += _Settings.FIGURES[cluster.type].points * cluster.length;
+	                }
+	            } catch (err) {
+	                _didIteratorError = true;
+	                _iteratorError = err;
+	            } finally {
+	                try {
+	                    if (!_iteratorNormalCompletion && _iterator.return) {
+	                        _iterator.return();
+	                    }
+	                } finally {
+	                    if (_didIteratorError) {
+	                        throw _iteratorError;
+	                    }
+	                }
+	            }
+
+	            return score;
+	        }
+	    }, {
+	        key: 'increaseScore',
+	        value: function increaseScore(count) {
+	            this.score += count;
 	        }
 
 	        // Static
@@ -394,19 +445,12 @@
 	    }, {
 	        key: 'setGameStateMove',
 	        value: function setGameStateMove(x1, y1, x2, y2) {
-	            this.swapCells(x1, y1, x2, y2);
-	            this.increaseScore(1);
-	            this.removeClusters();
+	            this.handleMove(x1, y1, x2, y2);
 	        }
 	    }, {
 	        key: 'getScore',
 	        value: function getScore() {
 	            return this.score;
-	        }
-	    }, {
-	        key: 'increaseScore',
-	        value: function increaseScore(count) {
-	            this.score += count;
 	        }
 	    }], [{
 	        key: 'getRandomTypeOfCell',
